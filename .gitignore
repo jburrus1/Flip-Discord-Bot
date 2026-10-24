@@ -1,0 +1,18 @@
+# JetBrains IDE
+.idea/
+*.iml
+
+# Go build outputs
+/bin/
+*.exe
+*.test
+*.out
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# .NET build outputs (for later)
+**/bin/
+**/obj/
