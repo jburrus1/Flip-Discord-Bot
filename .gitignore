@@ -16,3 +16,4 @@
 # .NET build outputs (for later)
 **/bin/
 **/obj/
+/Backend/Folder.DotSettings.user
