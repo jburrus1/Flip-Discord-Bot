@@ -1,6 +1,7 @@
 package main
 
 import (
+	"discord-bot/discord"
 	"log"
 	"os"
 	"os/signal"
@@ -20,7 +21,8 @@ func main() {
 	}
 
 	dg.Identify.Intents = discordgo.IntentsGuildMessages |
-		discordgo.IntentsMessageContent
+		discordgo.IntentsMessageContent |
+		discordgo.IntentsGuildMembers
 
 	if err := dg.Open(); err != nil {
 		log.Fatal(err)
@@ -29,6 +31,8 @@ func main() {
 
 	addHandlers(dg)
 	addCommands(dg)
+
+	discord.GetMessagesTest(dg)
 
 	log.Println("Bot is running!")
 
