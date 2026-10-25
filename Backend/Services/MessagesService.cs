@@ -62,4 +62,9 @@ public class MessagesService
     {
         return await _dbContext.Messages.Where(m => m.AuthorId == userId).ToListAsync();
     }
+    
+    public async Task<List<DiscordMessage>> GetAllAsync()
+    {
+        return await _dbContext.Messages.ToListAsync();
+    }
 }

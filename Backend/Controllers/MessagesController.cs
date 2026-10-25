@@ -18,6 +18,7 @@ public class MessagesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DiscordMessage>> Create(DiscordMessage message)
     {
+        Console.WriteLine("Creating message...");
         await _messagesService.AddAsync(message);
         return CreatedAtAction(nameof(GetById), new { id = message.Id }, message);
     }
@@ -39,6 +40,13 @@ public class MessagesController : ControllerBase
         }
 
         return Ok(message);
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<List<DiscordMessage>>> GetAll()
+    {
+        var messages = await _messagesService.GetAllAsync();
+        return Ok(messages);
     }
 
     [HttpDelete("{id}")]

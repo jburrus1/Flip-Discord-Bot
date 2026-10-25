@@ -1,7 +1,7 @@
 package main
 
 import (
-	"discord-bot/discord"
+	"discord-bot/commands"
 	"log"
 	"os"
 	"os/signal"
@@ -32,8 +32,6 @@ func main() {
 	addHandlers(dg)
 	addCommands(dg)
 
-	discord.GetMessagesTest(dg)
-
 	log.Println("Bot is running!")
 
 	stop := make(chan os.Signal, 1)
@@ -47,18 +45,8 @@ func addHandlers(dg *discordgo.Session) {
 }
 
 func addCommands(dg *discordgo.Session) {
-	log.Println("Registering /ping")
-	_, err := dg.ApplicationCommandCreate(
-		dg.State.User.ID,
-		os.Getenv("GUILD_ID"),
-		&discordgo.ApplicationCommand{
-			Name:        "ping",
-			Description: "Check if bot is responding",
-		})
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	commands.CreateTestingCommands(dg)
+	commands.CreateManualDbCommands(dg)
 }
 
 func interactionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -69,18 +57,18 @@ func interactionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	command := i.ApplicationCommandData()
 
 	log.Printf("Handling command: %v\n", command.Name)
+	var err error
 	switch command.Name {
 	case "ping":
-		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "Pong!",
-			},
-		})
+		err = commands.Ping(s, i)
+	case "reset-db":
+		err = commands.ResetDb(s, i)
+	case "init-db":
+		err = commands.InitDb(s, i)
+	}
 
-		if err != nil {
-			log.Println(err)
-		}
+	if err != nil {
+		log.Println(err)
 	}
 }
 
