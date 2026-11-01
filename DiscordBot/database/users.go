@@ -19,27 +19,33 @@ func SyncUsersDb(dg *discordgo.Session, guildID string) {
 	}
 
 	for _, member := range members {
-		if member.User == nil {
-			continue
-		}
-
-		body, err := json.Marshal(struct {
-			ID       string `json:"id"`
-			Username string `json:"username"`
-		}{
-			ID:       member.User.ID,
-			Username: member.User.Username,
-		})
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		resp, err := http.Post(os.Getenv("BACKEND_URL")+"/api/Users", "application/json", bytes.NewReader(body))
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		resp.Body.Close()
+		SaveUser(member)
 	}
+}
+
+func SaveUser(member *discordgo.Member) {
+
+	if member.User == nil {
+		return
+	}
+	log.Println("Saving user:", member.User.Username)
+
+	body, err := json.Marshal(struct {
+		ID       string `json:"id"`
+		Username string `json:"username"`
+	}{
+		ID:       member.User.ID,
+		Username: member.User.Username,
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	resp, err := http.Post(os.Getenv("BACKEND_URL")+"/api/Users", "application/json", bytes.NewReader(body))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	resp.Body.Close()
 }

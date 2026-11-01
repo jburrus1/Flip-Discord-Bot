@@ -34,43 +34,7 @@ func SyncMessagesDb(dg *discordgo.Session, serverId string) {
 			continue
 		}
 		for _, message := range messages {
-			if message.Author == nil {
-				continue
-			}
-
-			body, err := json.Marshal(struct {
-				ID        string    `json:"id"`
-				AuthorID  string    `json:"authorId"`
-				ChannelID string    `json:"channelId"`
-				Content   string    `json:"content"`
-				Timestamp time.Time `json:"timestamp"`
-			}{
-				ID:        message.ID,
-				AuthorID:  message.Author.ID,
-				ChannelID: message.ChannelID,
-				Content:   message.Content,
-				Timestamp: message.Timestamp.UTC(),
-			})
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			resp, err := http.Post(os.Getenv("BACKEND_URL")+"/api/Messages", "application/json", bytes.NewReader(body))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-				responseBody, _ := io.ReadAll(resp.Body)
-
-				log.Printf(
-					"Failed to save message %s: %s - %s",
-					message.ID,
-					resp.Status,
-					string(responseBody),
-				)
-			}
-			resp.Body.Close()
+			SaveMessage(message)
 		}
 	}
 	if err != nil {
@@ -78,6 +42,50 @@ func SyncMessagesDb(dg *discordgo.Session, serverId string) {
 		return
 	}
 	log.Println(os.Getenv("BACKEND_URL") + "/api/Messages")
+}
+
+func SaveMessage(message *discordgo.Message) {
+	if message.Author == nil {
+		return
+	}
+	if message.Content == "" {
+		return
+	}
+	log.Println("Saving message: " + message.Content)
+
+	body, err := json.Marshal(struct {
+		ID        string    `json:"id"`
+		AuthorID  string    `json:"authorId"`
+		ChannelID string    `json:"channelId"`
+		Content   string    `json:"content"`
+		Timestamp time.Time `json:"timestamp"`
+	}{
+		ID:        message.ID,
+		AuthorID:  message.Author.ID,
+		ChannelID: message.ChannelID,
+		Content:   message.Content,
+		Timestamp: message.Timestamp.UTC(),
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	resp, err := http.Post(os.Getenv("BACKEND_URL")+"/api/Messages", "application/json", bytes.NewReader(body))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		responseBody, _ := io.ReadAll(resp.Body)
+
+		log.Printf(
+			"Failed to save message %s: %s - %s",
+			message.ID,
+			resp.Status,
+			string(responseBody),
+		)
+	}
+	resp.Body.Close()
 }
 
 func GetMostRecentMessage(dg *discordgo.Session, serverID string) *discordgo.Message {

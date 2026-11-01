@@ -44,6 +44,9 @@ func main() {
 func addHandlers(dg *discordgo.Session) {
 	dg.AddHandler(interactionCreate)
 	dg.AddHandler(handlers.ServerCreate)
+	dg.AddHandler(handlers.MessageCreate)
+	dg.AddHandler(handlers.UserJoin)
+	dg.AddHandler(handlers.ChannelCreate)
 }
 
 func addCommands(dg *discordgo.Session) {
