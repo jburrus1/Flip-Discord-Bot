@@ -13,11 +13,8 @@ func ServerCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
 }
 
 func syncDatabase(s *discordgo.Session, g *discordgo.GuildCreate) {
+	database.SyncServersDb(s, g.ID)
+	database.SyncChannelsDb(s, g.ID)
 	database.SyncUsersDb(s, g.ID)
-	for _, channel := range g.Channels {
-		if channel.Type != discordgo.ChannelTypeGuildText {
-			continue
-		}
-		database.SyncMessagesDb(s, channel.ID)
-	}
+	database.SyncMessagesDb(s, g.ID)
 }

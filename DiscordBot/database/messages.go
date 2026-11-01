@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -22,6 +23,9 @@ func SyncMessagesDb(dg *discordgo.Session, serverId string) {
 	}
 
 	for _, channel := range channels {
+		if channel.Type != discordgo.ChannelTypeGuildText {
+			continue
+		}
 		messages, err := GetMessagesAfter(dg, channel.ID, afterId)
 		if err != nil {
 			continue
@@ -35,15 +39,17 @@ func SyncMessagesDb(dg *discordgo.Session, serverId string) {
 			}
 
 			body, err := json.Marshal(struct {
-				ID        string `json:"id"`
-				AuthorID  string `json:"authorId"`
-				ChannelID string `json:"channelId"`
-				Content   string `json:"content"`
+				ID        string    `json:"id"`
+				AuthorID  string    `json:"authorId"`
+				ChannelID string    `json:"channelId"`
+				Content   string    `json:"content"`
+				Timestamp time.Time `json:"timestamp"`
 			}{
 				ID:        message.ID,
 				AuthorID:  message.Author.ID,
 				ChannelID: message.ChannelID,
 				Content:   message.Content,
+				Timestamp: message.Timestamp.UTC(),
 			})
 			if err != nil {
 				log.Println(err)
