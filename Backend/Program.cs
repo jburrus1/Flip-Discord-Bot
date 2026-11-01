@@ -16,6 +16,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<ChannelsService>();
+builder.Services.AddScoped<ServersService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
