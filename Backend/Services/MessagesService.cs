@@ -13,10 +13,17 @@ public class MessagesService
         _dbContext = dbContext;
     }
     
-    public async Task AddAsync(DiscordMessage message)
+    public async Task<DiscordMessage> AddAsync(DiscordMessage message)
     {
+        var existing = await _dbContext.Messages
+            .FirstOrDefaultAsync(m => m.Id == message.Id);
+
+        if (!(existing is null))
+            return existing;
         await _dbContext.Messages.AddAsync(message);
         await _dbContext.SaveChangesAsync();
+        
+        return message;
     }
     
     public async Task<bool> DeleteAsync(string id)
@@ -66,5 +73,10 @@ public class MessagesService
     public async Task<List<DiscordMessage>> GetAllAsync()
     {
         return await _dbContext.Messages.ToListAsync();
+    }
+    
+    public async Task<DiscordMessage?> GetRecentByServerIdAsync(string serverId)
+    {
+        return await _dbContext.Messages.Where(m => m.Channel.ServerId == serverId).OrderByDescending(m => m.Timestamp).FirstOrDefaultAsync();
     }
 }

@@ -10,7 +10,12 @@ public class DiscordMessage
     public string ChannelId { get; set; } = null!;
     public string Content { get; set; } = null!;
     
+    public DateTimeOffset Timestamp { get; set; }
+    
     [JsonIgnore]
     [ValidateNever]
     public DiscordUser Author { get; set; } = null!;
+    [JsonIgnore]
+    [ValidateNever]
+    public DiscordChannel Channel { get; set; } = null!;
 }

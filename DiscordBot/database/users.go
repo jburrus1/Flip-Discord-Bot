@@ -11,8 +11,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func InitUsersDb(dg *discordgo.Session) {
-	members, err := discord.GetMembers(dg, os.Getenv("GUILD_ID"))
+func SyncUsersDb(dg *discordgo.Session, guildID string) {
+	members, err := discord.GetMembers(dg, guildID)
 	if err != nil {
 		log.Println(err)
 		return

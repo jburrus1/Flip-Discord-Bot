@@ -15,6 +15,12 @@ public class UsersService
 
     public async Task<DiscordUser> CreateAsync(DiscordUser user)
     {
+        
+        var existing = await _dbContext.Users
+            .FirstOrDefaultAsync(m => m.Id == user.Id);
+
+        if (!(existing is null))
+            return existing;
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
 

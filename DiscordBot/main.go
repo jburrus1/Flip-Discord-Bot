@@ -2,6 +2,7 @@ package main
 
 import (
 	"discord-bot/commands"
+	"discord-bot/handlers"
 	"log"
 	"os"
 	"os/signal"
@@ -22,7 +23,8 @@ func main() {
 
 	dg.Identify.Intents = discordgo.IntentsGuildMessages |
 		discordgo.IntentsMessageContent |
-		discordgo.IntentsGuildMembers
+		discordgo.IntentsGuildMembers |
+		discordgo.IntentsGuilds
 
 	if err := dg.Open(); err != nil {
 		log.Fatal(err)
@@ -40,8 +42,8 @@ func main() {
 }
 
 func addHandlers(dg *discordgo.Session) {
-	dg.AddHandler(messageCreate)
 	dg.AddHandler(interactionCreate)
+	dg.AddHandler(handlers.ServerCreate)
 }
 
 func addCommands(dg *discordgo.Session) {
@@ -63,17 +65,9 @@ func interactionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		err = commands.Ping(s, i)
 	case "reset-db":
 		err = commands.ResetDb(s, i)
-	case "init-db":
-		err = commands.InitDb(s, i)
 	}
 
 	if err != nil {
 		log.Println(err)
-	}
-}
-
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.Bot {
-		return
 	}
 }

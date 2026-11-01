@@ -109,34 +109,10 @@ func ResetDb(dg *discordgo.Session, i *discordgo.InteractionCreate) error {
 }
 
 func InitDb(dg *discordgo.Session, i *discordgo.InteractionCreate) error {
-	option := i.ApplicationCommandData().GetOption("database")
-	if option == nil {
-		return dg.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "No database was selected.",
-			},
-		})
-	}
-
-	db := option.StringValue()
 	var target string
 	success := false
-	switch db {
-	case "all":
-		target = "all databases"
-		database.InitUsersDb(dg)
-		database.InitMessagesDb(dg, i.ChannelID)
-	case "users":
-		target = "the users database"
-		database.InitUsersDb(dg)
-	case "messages":
-		target = "the messages database"
-		database.InitMessagesDb(dg, i.ChannelID)
-		success = true
-	default:
-		target = "an unknown database"
-	}
+	//database.SyncUsersDb(dg)
+	database.SyncMessagesDb(dg, i.ChannelID)
 
 	if success {
 		return dg.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
