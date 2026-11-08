@@ -13,6 +13,7 @@ builder.Services.AddDbContext<DiscordDbContext>(options =>
     options.UseNpgsql(connectionString));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<UsersService>();
@@ -28,10 +29,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<DiscordDbContext>();
+await dbContext.Database.MigrateAsync();
+
 // app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();

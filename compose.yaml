@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: discord_bot
+      POSTGRES_USER: discord_app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U discord_app -d discord_bot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./Backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DiscordDb: "Host=db;Port=5432;Database=discord_bot;Username=discord_app;Password=${POSTGRES_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      db:
+        condition: service_healthy
+
+  bot:
+    build: ./DiscordBot
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8080
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
