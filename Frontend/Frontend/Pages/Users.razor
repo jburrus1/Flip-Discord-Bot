@@ -1,0 +1,30 @@
+@page "/users"
+@using Frontend.Models
+@inject HttpClient Http
+
+<h3>Discord Users</h3>
+@if (users is null)
+{
+    <p>Loading users...</p>
+}
+else if (users.Count == 0)
+{
+    <p>No users found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var user in users)
+        {
+            <li>@user.Username</li>
+        }
+    </ul>
+}
+@code {
+    private List<DiscordUser>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await Http.GetFromJsonAsync<List<DiscordUser>>("api/Users");
+    }
+}

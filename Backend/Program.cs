@@ -19,6 +19,15 @@ builder.Services.AddScoped<MessagesService>();
 builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<ChannelsService>();
 builder.Services.AddScoped<ServersService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5052")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,7 +43,7 @@ var dbContext = scope.ServiceProvider.GetRequiredService<DiscordDbContext>();
 await dbContext.Database.MigrateAsync();
 
 // app.UseHttpsRedirection();
-
+app.UseCors("BlazorFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
