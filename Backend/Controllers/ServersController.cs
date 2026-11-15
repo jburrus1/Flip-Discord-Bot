@@ -22,6 +22,14 @@ public class ServersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = server.Id }, server);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<DiscordServer>>> GetAllServers()
+    {
+        var servers = await _serversService.GetAllAsync();
+
+        return Ok(servers);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<DiscordServer>> GetById(string id)
     {
@@ -44,8 +52,29 @@ public class ServersController : ControllerBase
     [HttpPost("{serverId}/users")]
     public async Task<ActionResult> AddUser(string serverId, AddServerMemberRequest memberRequest)
     {
-        //test
         await _serversService.AddUserToServerAsync(serverId, memberRequest.UserId);
         return NoContent();
+    }
+    [HttpGet("{serverId}/users")]
+    public async Task<ActionResult<List<DiscordUser>>> GetUsers(string serverId)
+    {
+        
+        if (!await _serversService.ExistsAsync(serverId))
+        {
+            return NotFound();
+        }
+        var users = await _serversService.GetUsersAsync(serverId);
+        return Ok(users);
+    }
+    [HttpGet("{serverId}/messages")]
+    public async Task<ActionResult<List<DiscordMessage>>> GetMessages(string serverId)
+    {
+        
+        if (!await _serversService.ExistsAsync(serverId))
+        {
+            return NotFound();
+        }
+        var messages = await _serversService.GetMessagesAsync(serverId);
+        return Ok(messages);
     }
 }

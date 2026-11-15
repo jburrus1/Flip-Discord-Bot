@@ -30,6 +30,10 @@ public class ServersService
         return await _dbContext.Servers.FindAsync(id);
     }
 
+    public async Task<List<DiscordServer>> GetAllAsync()
+    {
+        return await _dbContext.Servers.ToListAsync();
+    }
     public async Task<bool> DeleteAsync(string id)
     {
         var server = await _dbContext.Servers.FindAsync(id);
@@ -75,5 +79,10 @@ public class ServersService
     public async Task<List<DiscordMessage>> GetMessagesAsync(string serverId)
     {
         return await _dbContext.Messages.Where(m => m.Channel.ServerId == serverId).ToListAsync();
+    }
+    public async Task<bool> ExistsAsync(string serverId)
+    {
+        return await _dbContext.Servers
+            .AnyAsync(s => s.Id == serverId);
     }
 }

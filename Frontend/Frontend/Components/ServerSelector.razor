@@ -1,0 +1,28 @@
+@using Frontend.Models
+@using Frontend.Services
+@using Frontend.State
+@inject ServersService ServersService
+@inject ServerSelectionState ServerSelectionState
+
+<select @bind="selectedServerId" @bind:after="OnServerChanged">
+    <option value="">Select a server</option>
+
+    @foreach (var server in servers)
+    {
+        <option value="@server.Id">@server.Name</option>
+    }
+</select>
+
+@code {
+    private List<DiscordServer> servers = new();
+    private string selectedServerId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        servers = await ServersService.GetServersAsync();
+    }
+    private void OnServerChanged()
+    {
+        ServerSelectionState.SelectServer(selectedServerId);
+    }
+}

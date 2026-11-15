@@ -1,12 +1,19 @@
 @page "/users"
 @using Frontend.Models
+@using Frontend.State
 @inject HttpClient Http
 @inject UsersService UsersService
+@inject ServerSelectionState ServerSelectionState
+@implements IDisposable
 
 <h3>Discord Users</h3>
 @if (users is null)
 {
     <p>Loading users...</p>
+}
+else if (string.IsNullOrEmpty(ServerSelectionState.SelectedServerId))
+{
+    <p>No server selected.</p>
 }
 else if (users.Count == 0)
 {
@@ -26,6 +33,34 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        users = await UsersService.GetUsersAsync();
+        ServerSelectionState.OnChange += OnServerChanged;
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        var serverId = ServerSelectionState.SelectedServerId;
+
+        if (string.IsNullOrEmpty(serverId))
+        {
+            users = new List<DiscordUser>();
+            return;
+        }
+
+        users = null;
+        StateHasChanged();
+        users = await UsersService.GetUsersAsync(serverId);
+    }
+    private void OnServerChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await LoadUsersAsync();
+            StateHasChanged();
+        });
+    }
+    public void Dispose()
+    {
+        ServerSelectionState.OnChange -= OnServerChanged;
     }
 }
