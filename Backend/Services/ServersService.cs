@@ -43,4 +43,37 @@ public class ServersService
 
         return false;
     }
+
+    public async Task<ServerMember?> AddUserToServerAsync(string serverId, string userId)
+    {
+        var existing = await _dbContext.ServerMembers.FirstOrDefaultAsync(m => m.ServerId == serverId && m.UserId == userId);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var member = new ServerMember
+        {
+            ServerId = serverId,
+            UserId = userId
+        };
+        
+
+        await _dbContext.ServerMembers.AddAsync(member);
+        await _dbContext.SaveChangesAsync();
+
+        return member;
+    }
+
+    public async Task<List<DiscordUser>> GetUsersAsync(string serverId)
+    {
+        return await _dbContext.ServerMembers
+            .Where(m => m.ServerId == serverId)
+            .Select(m => m.User).ToListAsync();
+    }
+
+    public async Task<List<DiscordMessage>> GetMessagesAsync(string serverId)
+    {
+        return await _dbContext.Messages.Where(m => m.Channel.ServerId == serverId).ToListAsync();
+    }
 }

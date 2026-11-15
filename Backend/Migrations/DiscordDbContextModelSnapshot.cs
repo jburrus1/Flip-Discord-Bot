@@ -99,6 +99,21 @@ namespace Backend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Backend.Models.ServerMember", b =>
+                {
+                    b.Property<string>("ServerId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("ServerId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ServerMembers");
+                });
+
             modelBuilder.Entity("Backend.Models.DiscordChannel", b =>
                 {
                     b.HasOne("Backend.Models.DiscordServer", "Server")
@@ -127,6 +142,25 @@ namespace Backend.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("Backend.Models.ServerMember", b =>
+                {
+                    b.HasOne("Backend.Models.DiscordServer", "Server")
+                        .WithMany()
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.DiscordUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Server");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

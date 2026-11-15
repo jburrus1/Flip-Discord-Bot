@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+      args:
+        BUILD_CONFIGURATION: Debug
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      WAIT_FOR_DEBUGGER: "true"
+    cap_add:
+      - SYS_PTRACE
+    healthcheck:
+      start_period: 10m

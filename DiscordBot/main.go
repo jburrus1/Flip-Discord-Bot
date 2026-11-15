@@ -51,7 +51,6 @@ func addHandlers(dg *discordgo.Session) {
 
 func addCommands(dg *discordgo.Session) {
 	commands.CreateTestingCommands(dg)
-	commands.CreateManualDbCommands(dg)
 }
 
 func interactionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {

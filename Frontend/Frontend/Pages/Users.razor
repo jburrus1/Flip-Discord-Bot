@@ -1,6 +1,7 @@
 @page "/users"
 @using Frontend.Models
 @inject HttpClient Http
+@inject UsersService UsersService
 
 <h3>Discord Users</h3>
 @if (users is null)
@@ -25,6 +26,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        users = await Http.GetFromJsonAsync<List<DiscordUser>>("api/Users");
+        users = await UsersService.GetUsersAsync();
     }
 }

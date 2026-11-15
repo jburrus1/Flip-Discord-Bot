@@ -2,6 +2,22 @@ using Backend.Data;
 using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 
+using System.Diagnostics;
+
+#if DEBUG
+if (Environment.GetEnvironmentVariable("WAIT_FOR_DEBUGGER") == "true")
+{
+    Console.WriteLine("Waiting for debugger...");
+
+    while (!Debugger.IsAttached)
+    {
+        Thread.Sleep(100);
+    }
+
+    Debugger.Break();
+}
+#endif
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DiscordDb");
 // Add services to the container.

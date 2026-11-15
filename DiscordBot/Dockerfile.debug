@@ -1,0 +1,19 @@
+FROM golang:1.27-alpine AS build
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -gcflags="all=-N -l" -o /bot .
+
+FROM alpine:3.22
+RUN apk add --no-cache ca-certificates
+COPY --from=build /bot /bot
+COPY --from=build /go/bin/dlv /usr/local/bin/dlv
+USER 65532:65532
+
+CMD ["dlv", "exec", "/bot", \
+     "--headless", \
+     "--listen=:2345", \
+     "--api-version=2", \
+     "--accept-multiclient"]

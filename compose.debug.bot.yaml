@@ -1,0 +1,8 @@
+services:
+  bot:
+    build:
+      dockerfile: Dockerfile.debug
+    ports:
+      - "127.0.0.1:2345:2345"
+    cap_add:
+      - SYS_PTRACE

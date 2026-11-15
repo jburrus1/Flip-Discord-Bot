@@ -40,4 +40,12 @@ public class ServersController : ControllerBase
         await _serversService.DeleteAsync(id);
         return NoContent();
     }
+    
+    [HttpPost("{serverId}/users")]
+    public async Task<ActionResult> AddUser(string serverId, AddServerMemberRequest memberRequest)
+    {
+        //test
+        await _serversService.AddUserToServerAsync(serverId, memberRequest.UserId);
+        return NoContent();
+    }
 }

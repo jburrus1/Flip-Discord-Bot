@@ -2,79 +2,9 @@ package commands
 
 import (
 	"discord-bot/database"
-	"log"
-	"os"
 
 	"github.com/bwmarrin/discordgo"
 )
-
-func CreateManualDbCommands(dg *discordgo.Session) {
-	_, err := dg.ApplicationCommandCreate(
-		dg.State.User.ID,
-		os.Getenv("GUILD_ID"),
-		&discordgo.ApplicationCommand{
-			Name:        "reset-db",
-			Description: "Reset database(s)",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "database",
-					Description: "Database to reset",
-					Required:    true,
-					Choices: []*discordgo.ApplicationCommandOptionChoice{
-						{
-							Name:  "All",
-							Value: "all",
-						},
-						{
-							Name:  "Users",
-							Value: "users",
-						},
-						{
-							Name:  "Messages",
-							Value: "messages",
-						},
-					},
-				},
-			},
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = dg.ApplicationCommandCreate(
-		dg.State.User.ID,
-		os.Getenv("GUILD_ID"),
-		&discordgo.ApplicationCommand{
-			Name:        "init-db",
-			Description: "Initialize database(s)",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "database",
-					Description: "Database to initialize",
-					Required:    true,
-					Choices: []*discordgo.ApplicationCommandOptionChoice{
-						{
-							Name:  "All",
-							Value: "all",
-						},
-						{
-							Name:  "Users",
-							Value: "users",
-						},
-						{
-							Name:  "Messages",
-							Value: "messages",
-						},
-					},
-				},
-			},
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 func ResetDb(dg *discordgo.Session, i *discordgo.InteractionCreate) error {
 	option := i.ApplicationCommandData().GetOption("database")
